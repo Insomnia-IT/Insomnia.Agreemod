@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Collection.EntityFrameworkCore" Version="7.0.1" />
+    <PackageReference Include="DelegateDecompiler.EntityFrameworkCore5" Version="0.29.1" />
+    <PackageReference Include="Notion.Net" Version="2.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Insomnia.Agreemod.Data\Insomnia.Agreemod.Data.csproj" ReplaceParameters="true" />
+    <ProjectReference Include="..\Insomnia.Agreemod.General\Insomnia.Agreemod.General.csproj" ReplaceParameters="true" />
+  </ItemGroup>
+
+</Project>
