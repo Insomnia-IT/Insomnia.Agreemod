@@ -26,11 +26,11 @@ namespace Insomnia.Agreemod.BI.Services
 
         private readonly NotionClient _client;
 
-        public Notion(NotionConfig config)
+        public Notion()
         {
             _client = NotionClientFactory.Create(new ClientOptions
             {
-                AuthToken = config.Token
+                AuthToken = "secret_53UctpAbVC9WQKtKexCPEhEw8FIkJNq5nq9nfemeR5x"
             });
         }
 

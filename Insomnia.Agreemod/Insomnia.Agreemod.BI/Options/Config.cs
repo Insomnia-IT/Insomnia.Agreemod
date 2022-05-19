@@ -8,6 +8,6 @@ namespace Insomnia.Agreemod.BI.Options
 {
     public class Config
     {
-        public NotionConfig Notion { get; set; }
+       // public NotionConfig Notion { get; set; }
     }
 }
