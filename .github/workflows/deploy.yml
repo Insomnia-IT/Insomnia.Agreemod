@@ -18,7 +18,7 @@ jobs:
     - name: stop
       run: docker rm -f $IMAGE_NAME
     - name: run
-      run: docker run -d -p 4000:80 --network=apps --restart=always --name $IMAGE_NAME-client $IMAGE_NAME-client:$GITHUB_SHA
+      run: docker run -d -p 4000:80 --network=apps --restart=always --name $IMAGE_NAME $IMAGE_NAME:$GITHUB_SHA
     - name: cleanup docker containers
       run: docker container prune --filter "until=30m" -f
     - name: cleanup docker images
