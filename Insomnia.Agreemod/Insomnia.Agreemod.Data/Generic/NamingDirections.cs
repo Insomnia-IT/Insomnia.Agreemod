@@ -9,6 +9,6 @@ namespace Insomnia.Agreemod.Data.Generic
     public static class NamingDirections
     {
         public const string FirstAidPost = "Медпункт";
-        public const string VetviDereva = "Ветви Дерев";
+        public const string VetviDereva = "Ветви Дерева";
     }
 }

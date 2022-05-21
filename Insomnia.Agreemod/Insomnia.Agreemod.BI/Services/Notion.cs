@@ -47,7 +47,7 @@ namespace Insomnia.Agreemod.BI.Services
                 {
                     Name = x.Name,
                     Nickname = x.Nickname,
-                    Directions = x.Directions,
+                    Directions = x.Directions.RemoveSystemsLocations() ?? x.OwnedbyLocation,
                     Locations = x.LeaderLocations,
                     Email = x.Email,
                     Phone = x.Phone,
@@ -164,6 +164,7 @@ namespace Insomnia.Agreemod.BI.Services
                     Name = (x.Properties[TablePropertiesNaming.PrticipantName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
                     Nickname = (x.Properties[TablePropertiesNaming.PrticipantNickname] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Position = (x.Properties[TablePropertiesNaming.PrticipantPosition] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
+                    OwnedbyLocation = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.PrticipantLocation] as RelationPropertyValue).Relation),
                     Directions = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.PrticipantDirection] as RelationPropertyValue).Relation),
                     WhoIt = (x.Properties[TablePropertiesNaming.PrticipantWhoIt] as MultiSelectPropertyValue).MultiSelect.FirstOrDefault()?.Name,
                     Avatar = (x.Properties[TablePropertiesNaming.PrticipantAvatar] as FilesPropertyValue).Files?.Select(x => x as UploadedFileWithName).FirstOrDefault()?.File?.Url,

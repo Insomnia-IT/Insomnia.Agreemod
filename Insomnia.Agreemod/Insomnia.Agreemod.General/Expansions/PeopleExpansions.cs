@@ -13,6 +13,7 @@ namespace Insomnia.Agreemod.General.Expansions
     {
         private static string[] WhoItProfessions = new[] { WhoIt.Lecturer, WhoIt.Musicant, WhoIt.Animator, WhoIt.Master };
         private static string[] FoodTypes = new[] { NamingFoodType.Free, NamingFoodType.Discont50 };
+        private static string[] SystemLocations  = new[] {NamingDirections.VetviDereva};
 
         public static BadgeColor GetBadgeColor(this PeopleDto people)
         {
@@ -61,6 +62,16 @@ namespace Insomnia.Agreemod.General.Expansions
                 result = "Волонтёр";
 
             return result;
+        }
+
+        public static string[] RemoveSystemsLocations(this string[] locations)
+        {
+           var result = locations.Where(x => !SystemLocations.Contains(x)).ToArray();
+            if (result.Length == 0)
+                return null;
+
+            return result;
+
         }
     }
 }

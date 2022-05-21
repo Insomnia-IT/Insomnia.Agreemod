@@ -30,6 +30,11 @@ namespace Insomnia.Agreemod.Data.Dto
         public string[] LeaderLocations { get; set; }
 
         /// <summary>
+        /// Участник если из Ветвей Дерева принадлежит какой-либо локации.
+        /// </summary>
+        public string[] OwnedbyLocation { get; set; }
+
+        /// <summary>
         /// Направления которым принадлежит человек
         /// </summary>
         public string[] Directions { get; set; }
