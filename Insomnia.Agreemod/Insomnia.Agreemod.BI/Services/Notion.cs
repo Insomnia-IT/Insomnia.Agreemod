@@ -23,6 +23,8 @@ namespace Insomnia.Agreemod.BI.Services
         /// Title - название страницы
         /// </summary>
         private static IList<DirectionDto> DirectionsCash = new List<DirectionDto>();
+        private readonly object cashLock = new object();
+
 
         private readonly NotionClient _client;
 
@@ -43,7 +45,7 @@ namespace Insomnia.Agreemod.BI.Services
                 peoples.AddRange(await GetVolunteers());
                 peoples.AddRange(await GetPrticipants());
 
-                var result = peoples.Select(x => new PeopleOutput()
+                var result = peoples.Where(x => !String.IsNullOrEmpty(x.Name)).Select(x => new PeopleOutput()
                 {
                     Name = x.Name,
                     Nickname = x.Nickname,
@@ -131,7 +133,7 @@ namespace Insomnia.Agreemod.BI.Services
                     Phone = (x.Properties[TablePropertiesNaming.Phone] as PhoneNumberPropertyValue).PhoneNumber,
                     Position = (x.Properties[TablePropertiesNaming.VolunteerPosition] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Directions = (x.Properties[TablePropertiesNaming.VolunteerDirection] as MultiSelectPropertyValue).MultiSelect.Select(x => x.Name).ToArray(),
-                    WhoIt = (x.Properties[TablePropertiesNaming.VolunteerWhoIt] as SelectPropertyValue).Select?.Name,
+                    WhoIt = (x.Properties[TablePropertiesNaming.VolunteerWhoIt] as FormulaPropertyValue).Formula?.String,
                     Avatar = (x.Properties[TablePropertiesNaming.VolunteerAvatar] as FilesPropertyValue).Files?.Select(x => x as UploadedFileWithName).FirstOrDefault()?.File?.Url,
                     VolunteerDirections = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.IsVolunteer] as RelationPropertyValue).Relation),
                     FoodType = (x.Properties[TablePropertiesNaming.VolunteerFoodType] as SelectPropertyValue).Select?.Name,
@@ -164,7 +166,7 @@ namespace Insomnia.Agreemod.BI.Services
                     Name = (x.Properties[TablePropertiesNaming.PrticipantName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
                     Nickname = (x.Properties[TablePropertiesNaming.PrticipantNickname] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Position = (x.Properties[TablePropertiesNaming.PrticipantPosition] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
-                    OwnedbyLocation = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.PrticipantLocation] as RelationPropertyValue).Relation),
+                    OwnedbyLocation = await GetLocationNaming((x.Properties[TablePropertiesNaming.PrticipantLocation] as RelationPropertyValue).Relation),
                     Directions = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.PrticipantDirection] as RelationPropertyValue).Relation),
                     WhoIt = (x.Properties[TablePropertiesNaming.PrticipantWhoIt] as MultiSelectPropertyValue).MultiSelect.FirstOrDefault()?.Name,
                     Avatar = (x.Properties[TablePropertiesNaming.PrticipantAvatar] as FilesPropertyValue).Files?.Select(x => x as UploadedFileWithName).FirstOrDefault()?.File?.Url,
@@ -187,12 +189,17 @@ namespace Insomnia.Agreemod.BI.Services
             return await _client.Databases.QueryAsync(databaseId, queryParameters);
         }
 
+        private async Task<string[]> GetLocationNaming(List<ObjectId> objects)
+        {
+            return (await Task.WhenAll(objects.Select(async x => await GetLocationName(x.Id)))).ToArray();
+        }
+
         private async Task<string[]> GetDirectionsNaming(List<ObjectId> objects)
         {
             return (await Task.WhenAll(objects.Select(async x => await GetDirectionName(x.Id)))).ToArray();
         }
 
-        private async Task<string> GetDirectionName(string id)
+        private async Task<string> GetLocationName(string id)
         {
             var result = DirectionsCash.FirstOrDefault(x => x.Id == id);
 
@@ -204,13 +211,49 @@ namespace Insomnia.Agreemod.BI.Services
                 result = new DirectionDto()
                 {
                     Id = id,
-                    Name = (page.Properties[TablePropertiesNaming.TitlePageName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText
+                    Name = (page.Properties[TablePropertiesNaming.LocationName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText
                 };
 
-                DirectionsCash.Add(result);
+                AddCash(result);
             }
 
             return result.Name;
+        }
+
+        private async Task<string> GetDirectionName(string id)
+        {
+            var result = GetCash(id);
+
+            if (result == null)
+            {
+                var page = await _client.Pages.RetrieveAsync(id);
+
+                result = new DirectionDto()
+                {
+                    Id = id,
+                    Name = (page.Properties[TablePropertiesNaming.TitlePageName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText
+                };
+
+                AddCash(result);
+            }
+
+            return result.Name;
+        }
+
+        private DirectionDto GetCash(string id)
+        {
+            lock (cashLock)
+            {
+                return DirectionsCash.FirstOrDefault(x => x.Id == id);
+            }
+        }
+
+        private void AddCash(DirectionDto model)
+        {
+            lock (cashLock)
+            {
+                DirectionsCash.Add(model);
+            }
         }
     }
 }

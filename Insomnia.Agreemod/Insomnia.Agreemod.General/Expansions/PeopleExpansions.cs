@@ -17,60 +17,99 @@ namespace Insomnia.Agreemod.General.Expansions
 
         public static BadgeColor GetBadgeColor(this PeopleDto people)
         {
-            var result = BadgeColor.Yellow;
-
-            if (people.LeaderLocations.IsNullOrEmpty())
-                result = BadgeColor.Red;
-            else if (people.IsVolunteer)
+            try
             {
-                if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true || people.WhoIt == WhoIt.Medic)
-                    result = BadgeColor.Purple;
-                else
-                    result = BadgeColor.Green;
-            }
-            else if (WhoItProfessions.Contains(people.WhoIt))
-                result = BadgeColor.Orange;
-            else if (people.VolunteerDirections?.Contains(NamingDirections.VetviDereva) == true)
-                result = BadgeColor.Blue;
+                var result = BadgeColor.Yellow;
 
-            return result;
+
+                if (people is null)
+                    return result;
+
+                if (!people.LeaderLocations.IsNullOrEmpty())
+                    result = BadgeColor.Red;
+                else if (people.IsVolunteer)
+                {
+                    if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true || people.WhoIt == WhoIt.Medic)
+                        result = BadgeColor.Purple;
+                    else
+                        result = BadgeColor.Green;
+                }
+                else if (WhoItProfessions.Contains(people.WhoIt))
+                    result = BadgeColor.Orange;
+                else if (people.Directions.NewUnion(people.VolunteerDirections)?.Contains(NamingDirections.VetviDereva) == true)
+                    result = BadgeColor.Blue;
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
         }
 
         public static FoodType GetFoodType(this PeopleDto people)
         {
-            var result = FoodType.Empty;
+            try
+            {
+                var result = FoodType.Empty;
 
-            if (people.LeaderLocations.IsNullOrEmpty() || people.IsVolunteer)
-                result = FoodType.Free;
-            else if (people.FoodType == NamingFoodType.Free)
-                result = FoodType.Free;
-            else if (people.FoodType == NamingFoodType.Discont50)
-                result = FoodType.Discount50;
+                if (!people.LeaderLocations.IsNullOrEmpty() || people.IsVolunteer)
+                    result = FoodType.Free;
+                else if (people.FoodType == NamingFoodType.Free)
+                    result = FoodType.Free;
+                else if (people.FoodType == NamingFoodType.Discont50)
+                    result = FoodType.Discount50;
 
-            return result;
+                return result;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
         }
 
         public static string GetPosition(this PeopleDto people)
         {
-            var result = people.WhoIt;
+            try
+            {
+                if (people is null)
+                    return String.Empty;
 
-            if (!String.IsNullOrEmpty(people.Position))
-                result = people.Position;
-            else if (people.LeaderLocations.IsNullOrEmpty())
-                result = "Организатор";
-            else if (people.IsVolunteer)
-                result = "Волонтёр";
+                var result = people.WhoIt;
 
-            return result;
+                if (!String.IsNullOrEmpty(people.Position))
+                    result = people.Position;
+                else if (!people.LeaderLocations.IsNullOrEmpty())
+                    result = "Организатор";
+                else if (people.IsVolunteer)
+                    result = "Волонтёр";
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
         }
 
         public static string[] RemoveSystemsLocations(this string[] locations)
         {
-           var result = locations.Where(x => !SystemLocations.Contains(x)).ToArray();
-            if (result.Length == 0)
-                return null;
+            try
+            {
+                var result = locations.Where(x => !SystemLocations.Contains(x)).ToArray();
+                if (result.Length == 0)
+                    return null;
 
-            return result;
+                return result;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
 
         }
     }

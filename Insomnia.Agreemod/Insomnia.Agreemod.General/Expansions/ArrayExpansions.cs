@@ -11,9 +11,19 @@ namespace Insomnia.Agreemod.General.Expansions
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
             if(array is null)
-                return false;
+                return true;
 
             return array.Any();
+        }
+
+        public static T[] NewUnion<T>(this T[] array1, T[] array2)
+        {
+            if(array1 is null || array1.Length == 0)
+                return array2;
+            if (array2 is null || array2.Length == 0)
+                return array1;
+
+            return array1.Union(array2).ToArray();
         }
     }
 }
