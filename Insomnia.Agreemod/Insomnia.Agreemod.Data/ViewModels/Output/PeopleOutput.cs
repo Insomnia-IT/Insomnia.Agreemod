@@ -12,6 +12,11 @@ namespace Insomnia.Agreemod.Data.ViewModels.Output
     public class PeopleOutput
     {
         /// <summary>
+        /// notion page id
+        /// </summary>
+        public string Uuid { get; set; }
+
+        /// <summary>
         /// Имя
         /// </summary>
         public string Name { get; set; }

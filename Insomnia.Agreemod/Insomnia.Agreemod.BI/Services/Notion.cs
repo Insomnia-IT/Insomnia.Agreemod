@@ -47,6 +47,7 @@ namespace Insomnia.Agreemod.BI.Services
 
                 var result = peoples.Where(x => !String.IsNullOrEmpty(x.Name)).Select(x => new PeopleOutput()
                 {
+                    Uuid = x.Uuid,
                     Name = x.Name,
                     Nickname = x.Nickname,
                     Directions = x.Directions.RemoveSystemsLocations() ?? x.OwnedbyLocation,
@@ -127,6 +128,7 @@ namespace Insomnia.Agreemod.BI.Services
 
                 peoples.AddRange((await Task.WhenAll(database.Results.Select(async x => new PeopleDto()
                 {
+                    Uuid = x.Id,
                     Name = (x.Properties[TablePropertiesNaming.VolunteerName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
                     Nickname = (x.Properties[TablePropertiesNaming.VolunteerNickname] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Email = (x.Properties[TablePropertiesNaming.Email] as EmailPropertyValue).Email,

@@ -10,6 +10,11 @@ namespace Insomnia.Agreemod.Data.Dto
     public class PeopleDto
     {
         /// <summary>
+        /// notion page id
+        /// </summary>
+        public string Uuid { get; set; }
+
+        /// <summary>
         /// Имя
         /// </summary>
         public string Name { get; set; }
