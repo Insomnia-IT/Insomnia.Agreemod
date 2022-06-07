@@ -12,6 +12,11 @@ namespace Insomnia.Agreemod.Data.ViewModels.Output
     public class PeopleOutput
     {
         /// <summary>
+        /// Id строки для синхронизации
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Имя
         /// </summary>
         public string Name { get; set; }

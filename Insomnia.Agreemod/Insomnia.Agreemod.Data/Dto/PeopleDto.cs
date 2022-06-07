@@ -10,6 +10,11 @@ namespace Insomnia.Agreemod.Data.Dto
     public class PeopleDto
     {
         /// <summary>
+        /// Id строки для синхронизации
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Имя
         /// </summary>
         public string Name { get; set; }

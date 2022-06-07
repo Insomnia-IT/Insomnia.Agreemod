@@ -15,8 +15,11 @@ namespace Insomnia.Agreemod.API.Configurations.Autofac
         {
             base.Load(builder);
 
-                builder.RegisterType<BI.Services.Notion>()
-                   .As<INotion>();
+            builder.RegisterType<BI.Services.Notion>()
+                .As<INotion>();
+
+            builder.RegisterType<ExcelService>()
+                .As<IExcel>();
 
             builder.Register(context => new MapperConfiguration(cfg =>
             {
