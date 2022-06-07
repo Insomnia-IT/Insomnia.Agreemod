@@ -63,7 +63,7 @@ namespace Insomnia.Agreemod.BI.Services
                     BadgeColor = x.GetBadgeColor(),
                 }).ToArray();
 
-                return new PeoplesReturn()
+               return new PeoplesReturn()
                 {
                     Success = true,
                     Peoples = result,
@@ -124,11 +124,8 @@ namespace Insomnia.Agreemod.BI.Services
 
                 database = await GetDatabase(DatabaseIds.Volunteers, filter);
 
-                //Фото UploadedFileWithName
-
                 peoples.AddRange((await Task.WhenAll(database.Results.Select(async x => new PeopleDto()
                 {
-                    Uuid = x.Id,
                     Name = (x.Properties[TablePropertiesNaming.VolunteerName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
                     Nickname = (x.Properties[TablePropertiesNaming.VolunteerNickname] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Email = (x.Properties[TablePropertiesNaming.Email] as EmailPropertyValue).Email,
@@ -165,7 +162,6 @@ namespace Insomnia.Agreemod.BI.Services
 
                 peoples.AddRange((await Task.WhenAll(database.Results.Select(async x => new PeopleDto()
                 {
-                    Uuid = x.Id,
                     Name = (x.Properties[TablePropertiesNaming.PrticipantName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
                     Nickname = (x.Properties[TablePropertiesNaming.PrticipantNickname] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,
                     Position = (x.Properties[TablePropertiesNaming.PrticipantPosition] as RichTextPropertyValue).RichText.FirstOrDefault()?.PlainText,

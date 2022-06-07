@@ -13,7 +13,7 @@ namespace Insomnia.Agreemod.General.Expansions
             if(array is null)
                 return true;
 
-            return array.Any();
+            return !array.Any();
         }
 
         public static T[] NewUnion<T>(this T[] array1, T[] array2)

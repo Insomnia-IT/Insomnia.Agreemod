@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Insomnia.Agreemod.BI.Interfaces;
+using Insomnia.Agreemod.Data.Dto;
 
 namespace Insomnia.Agreemod.API.Controllers
 {
@@ -19,12 +20,14 @@ namespace Insomnia.Agreemod.API.Controllers
         private readonly ILogger<NotionController> _logger;
         private readonly IMapper _mapper;
         private readonly INotion _notion;
+        private readonly IExcel _excel;
 
-        public NotionController(ILogger<NotionController> logger, IMapper mapper, INotion notion)
+        public NotionController(ILogger<NotionController> logger, IMapper mapper, INotion notion, IExcel excel)
         {
             _logger = logger;
             _mapper = mapper;
             _notion = notion;
+            _excel = excel;
         }
 
         [HttpGet("peoples")]
@@ -51,6 +54,39 @@ namespace Insomnia.Agreemod.API.Controllers
         public async Task<IActionResult> GetInfoForSchedules()
         {
             return Ok();
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> GetExport()
+        {
+            return File(_excel.ExcelFileGenerate<Badge>(new List<Badge>()
+                {
+                    new Badge()
+                    {
+                        Name = "ИМЯ",
+                        Type = "ТИП ПЕРВЫЙ"
+                    },
+                    new Badge()
+                    {
+                        Name = "Иван Иваныч",
+                        Type = "Человечек",
+                    },
+                    new Badge()
+                    {
+                        Name = "ВАААААААААААААААААА",
+                        Type = "Типа типа топ"
+                    },
+                    new Badge()
+                    {
+                        Name = "1",
+                        Type = null,
+                    },
+                    new Badge()
+                    {
+                        Name = null,
+                        Type = "2",
+                    }
+                }), "application/octet-stream", "MyWorkbook.xlsx");
         }
     }
 }
