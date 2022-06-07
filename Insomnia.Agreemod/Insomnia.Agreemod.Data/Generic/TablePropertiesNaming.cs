@@ -27,6 +27,7 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string IsVolunteer = "Волонтёр 2022";
         public const string VolunteerAvatar = "Фото";
         public const string VolunteerFoodType = "Питание";
+        public const string VolunteerId = "id";
         //Участники
         public const string PrticipantName = "Имя";
         public const string PrticipantNickname = "Позывной";
@@ -38,5 +39,6 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string IsVegan = "Веган";
         public const string PrticipantPosition = "Должность (на бейдж)";
         public const string PrticipantAvatar = "Фото";
+        public const string PrticipantId = "id";
     }
 }

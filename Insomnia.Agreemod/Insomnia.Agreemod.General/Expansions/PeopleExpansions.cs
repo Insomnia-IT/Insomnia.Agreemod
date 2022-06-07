@@ -21,7 +21,6 @@ namespace Insomnia.Agreemod.General.Expansions
             {
                 var result = BadgeColor.Yellow;
 
-
                 if (people is null)
                     return result;
 
@@ -29,11 +28,13 @@ namespace Insomnia.Agreemod.General.Expansions
                     result = BadgeColor.Red;
                 else if (people.IsVolunteer)
                 {
-                    if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true || people.WhoIt == WhoIt.Medic)
+                    if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true)
                         result = BadgeColor.Purple;
                     else
                         result = BadgeColor.Green;
                 }
+                else if (people.WhoIt == WhoIt.Medic)
+                    result = BadgeColor.Purple;
                 else if (WhoItProfessions.Contains(people.WhoIt))
                     result = BadgeColor.Orange;
                 else if (people.Directions.NewUnion(people.VolunteerDirections)?.Contains(NamingDirections.VetviDereva) == true)
