@@ -65,6 +65,11 @@ namespace Insomnia.Agreemod.Data.Dto
         public string WhoIt { get; set; }
 
         /// <summary>
+        /// Волонтёр выходного дня
+        /// </summary>
+        public bool IsWeekendVolunteer { get; set; }
+
+        /// <summary>
         /// Особенности питания
         /// </summary>
         public string NutritionFeatures { get; set; }

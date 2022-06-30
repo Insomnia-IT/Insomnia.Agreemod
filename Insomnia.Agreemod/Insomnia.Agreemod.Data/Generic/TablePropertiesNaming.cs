@@ -12,7 +12,10 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string Direction = "Направление 2022";
         public const string Tags = "Статус локации";
         public const string LocationName = "Название локации";
+        public const string SmallLocationName = "Кратко";
         public const string TitlePageName = "Name";
+        public const string SmallTitlePageName = "Кратко (для бейджа)";
+        public const string LocationDescription = "Описание локации";
 
         //Волонтёры
         public const string VolunteerName = "Имя";
@@ -28,6 +31,7 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string VolunteerAvatar = "Фото";
         public const string VolunteerFoodType = "Питание";
         public const string VolunteerId = "id";
+        public const string VolunteerWeekend = "Выходные";
         //Участники
         public const string PrticipantName = "Имя";
         public const string PrticipantNickname = "Позывной";
@@ -40,5 +44,17 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string PrticipantPosition = "Должность (на бейдж)";
         public const string PrticipantAvatar = "Фото";
         public const string PrticipantId = "id";
+        //Расписание
+        public const string TimetableName = "Name";
+        public const string TimetableDay = "Tags";
+        public const string TimetableType = "Тип";
+        public const string TimetableLocation = "Локация";
+        public const string TimetableSpeaker = "Ведущий/лектор";
+        public const string TimetableStart = "Время начала";
+        public const string TimetableEnd = "Время окончания";
+        public const string TimetableDescription = "Краткое описание";
+        public const string TimetableDescriptionSpeaker = "Описание автора";
+        public const string TimetablePrice = "Стоимость";
+
     }
 }

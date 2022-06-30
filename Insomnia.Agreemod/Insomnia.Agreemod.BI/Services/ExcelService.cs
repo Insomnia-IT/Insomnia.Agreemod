@@ -41,7 +41,7 @@ namespace Insomnia.Agreemod.BI.Services
 
         private int AddHeader(string header)
         {
-            var h = Headers.FirstOrDefault(x => x.Value == header.ToLower());
+            var h = Headers.FirstOrDefault(x => x.Value.ToLower() == header.ToLower());
 
             if (h.Value is null)
             {
@@ -54,11 +54,11 @@ namespace Insomnia.Agreemod.BI.Services
             return h.Key;
         }
 
-        public byte[] ExcelFileGenerate<T>(List<T> report) where T : ExportModel
+        public async Task<byte[]> ExcelFileGenerate<T>(ExcelModel<T> report, string fileName) where T : ExportModel
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var package = new ExcelPackage(new FileInfo("MyWorkbook.xlsx")))
+            using (var package = new ExcelPackage(new FileInfo($"{fileName}.xlsx")))
             {
                 var sheet = package.Workbook.Worksheets
                     .Add("Лист1");
@@ -87,7 +87,7 @@ namespace Insomnia.Agreemod.BI.Services
 
                 row = _startElementsRow;
 
-                foreach (var item in report)
+                foreach (var item in report.Models)
                 {
                     Type t = item.GetType();
 
@@ -106,7 +106,7 @@ namespace Insomnia.Agreemod.BI.Services
                 for(var col = 1; col <= Headers.Count; col++)
                     sheet.Column(col).Width = 22;
 
-                var lastRowNumber = report.Count + 1;
+                var lastRowNumber = report.Models.Count + 1;
                 var lastColNumber = Headers.Count;
                 var headerCells = sheet.Cells[_startRow, 1, 1, lastColNumber];
                 var allCells = sheet.Cells[_startRow, 1, lastRowNumber, lastColNumber];

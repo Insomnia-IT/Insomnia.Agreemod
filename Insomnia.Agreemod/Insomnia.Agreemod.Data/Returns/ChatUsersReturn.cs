@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Insomnia.Agreemod.Data.ViewModels.Output;
+using Insomnia.Agreemod.Data.Dto;
 
 namespace Insomnia.Agreemod.Data.Returns
 {
-    public class PeoplesReturn : BaseReturn
+    public class ChatUsersReturn : BaseReturn
     {
-        public List<PeopleOutput> Peoples { get; set; }
+        public List<ChatUser> Users { get; set; }
     }
 }

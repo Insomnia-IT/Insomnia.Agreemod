@@ -22,5 +22,10 @@ namespace Insomnia.Agreemod.Data.Generic
         /// Id страницы Участники
         /// </summary>
         public const string Prticipants = "d4108b863cb8451193b21f3a469b6157";
+
+        /// <summary>
+        /// Id страницы Расписание
+        /// </summary>
+        public const string Timetables = "a19c27554acb4d9a8d195e9dfe5a6baf";
     }
 }

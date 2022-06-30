@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Insomnia.Agreemod.BI.Interfaces;
 using Insomnia.Agreemod.Data.Dto;
+using Insomnia.Agreemod.BI.Options;
 
 namespace Insomnia.Agreemod.API.Controllers
 {
@@ -21,6 +22,7 @@ namespace Insomnia.Agreemod.API.Controllers
         private readonly IMapper _mapper;
         private readonly INotion _notion;
         private readonly IExcel _excel;
+        private readonly FilesConfig _config;
 
         public NotionController(ILogger<NotionController> logger, IMapper mapper, INotion notion, IExcel excel)
         {
@@ -28,6 +30,7 @@ namespace Insomnia.Agreemod.API.Controllers
             _mapper = mapper;
             _notion = notion;
             _excel = excel;
+            _config = new FilesConfig();
         }
 
         [HttpGet("peoples")]
@@ -36,6 +39,16 @@ namespace Insomnia.Agreemod.API.Controllers
             var result = await _notion.GetPeoples();
             if(result.Success)
                 return Ok(result.Peoples);
+
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("chat-users")]
+        public async Task<IActionResult> GetChatUsers()
+        {
+            var result = await _notion.GetChatUsers();
+            if (result.Success)
+                return Ok(result.Users);
 
             return BadRequest(result.ErrorMessage);
         }
@@ -59,34 +72,13 @@ namespace Insomnia.Agreemod.API.Controllers
         [HttpGet("export")]
         public async Task<IActionResult> GetExport()
         {
-            return File(_excel.ExcelFileGenerate<Badge>(new List<Badge>()
-                {
-                    new Badge()
-                    {
-                        Name = "ИМЯ",
-                        Type = "ТИП ПЕРВЫЙ"
-                    },
-                    new Badge()
-                    {
-                        Name = "Иван Иваныч",
-                        Type = "Человечек",
-                    },
-                    new Badge()
-                    {
-                        Name = "ВАААААААААААААААААА",
-                        Type = "Типа типа топ"
-                    },
-                    new Badge()
-                    {
-                        Name = "1",
-                        Type = null,
-                    },
-                    new Badge()
-                    {
-                        Name = null,
-                        Type = "2",
-                    }
-                }), "application/octet-stream", "MyWorkbook.xlsx");
+            return File(await _notion.ExportPeoples(), "application/octet-stream", _config.ZipFileName);
+        }
+
+        [HttpGet("export-locations")]
+        public async Task<IActionResult> GetExportLocations()
+        {
+            return File(await _notion.ExportLocations(), "application/octet-stream", _config.ZipFileName);
         }
     }
 }

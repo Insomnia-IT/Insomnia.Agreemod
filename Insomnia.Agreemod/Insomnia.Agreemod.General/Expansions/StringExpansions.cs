@@ -8,6 +8,50 @@ namespace Insomnia.Agreemod.General.Expansions
 {
     public static class StringExpansions
     {
+        private static (char rus, string eng)[] TranslateLetters = new[]
+        {
+            ('а', "a"),
+            ('б', "b"),
+            ('в', "v"),
+            ('г', "g"),
+            ('д', "d"),
+            ('е', "e"),
+            ('ё', "yo"),
+            ('ж', "j"),
+            ('з', "z"),
+            ('и', "i"),
+            ('й', "yi"),
+            ('к', "k"),
+            ('л', "l"),
+            ('м', "m"),
+            ('н', "n"),
+            ('о', "o"),
+            ('п', "p"),
+            ('р', "r"),
+            ('с', "s"),
+            ('т', "t"),
+            ('у', "u"),
+            ('ф', "f"),
+            ('х', "h"),
+            ('ц', "ts"),
+            ('ч', "ch"),
+            ('ш', "sh"),
+            ('щ', "shch"),
+            ('ъ', "."),
+            ('ы', "ui"),
+            ('ь', "'"),
+            ('э', "ye"),
+            ('ю', "yu"),
+            ('я', "ya"),
+        };
+        private static string[] NewCharForWhiteSpace = new string[]
+        {
+            ".",
+            "_",
+            ""
+        };
+
+
         public static bool CanParseToInt(this string number)
         {
             try
@@ -34,6 +78,29 @@ namespace Insomnia.Agreemod.General.Expansions
             }
 
             return true;
+        }
+
+        public static string TranslateChar(this char c)
+        {
+            if (TranslateLetters.Any(b => b.rus == c))
+                return TranslateLetters.FirstOrDefault(b => b.rus == c).eng;
+
+            if (c == ' ')
+            {
+                var random = (new Random()).Next(0, NewCharForWhiteSpace.Length);
+                return NewCharForWhiteSpace[random];
+            }
+            if (c == '_' || c == '.')
+                return $"{c}";
+            if(new char[] {'0','1','2','3','4','5','6','7','8','9'}.Contains(c))
+                return $"{c}";
+
+            return "";
+        }
+
+        public static string RemoveNotLetters(this string text)
+        {
+            return text.Replace(" ", "").Replace("(", "").Replace(")", "").Replace("/","").Replace("\\","");
         }
 
         //Смысла проверять как-то лучше никакого. 

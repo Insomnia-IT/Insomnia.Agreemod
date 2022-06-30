@@ -59,7 +59,7 @@ namespace Insomnia.Agreemod.Data.ViewModels.Output
         /// <summary>
         /// Цвет бейджика
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))] 
+        [JsonConverter(typeof(StringEnumConverter))]
         public BadgeColor BadgeColor { get; set; }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Insomnia.Agreemod.Data.ViewModels.Output
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public FoodType FoodType { get; set; }
-        
+
         /// <summary>
         /// Особенности питания
         /// </summary>
@@ -82,5 +82,15 @@ namespace Insomnia.Agreemod.Data.ViewModels.Output
         /// Дата отъезда с поля
         /// </summary>
         public DateTime? DepartureDate { get; set; }
+
+        /// <summary>
+        /// Волонтёр ли человек
+        /// </summary>
+        public bool IsVolunteer { get; set; }
+
+        /// <summary>
+        /// QR код.
+        /// </summary>
+        public string QR { get; set; }
     }
 }

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-NAME=nt_load
+NAME=agreemod
 
-docker rm -f $NAME
 docker build --no-cache -t $NAME .
-docker run -p 4000:80 -it --name $NAME $NAME
+docker rm -f $NAME
+docker run -d  --network=apps -p 5500:80 --restart=always --name $NAME $NAME
 

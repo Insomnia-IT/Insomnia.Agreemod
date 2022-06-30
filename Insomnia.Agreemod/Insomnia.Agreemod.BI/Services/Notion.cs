@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using Notion.Client;
 using Notion;
@@ -13,6 +14,8 @@ using Insomnia.Agreemod.Data.Returns;
 using Insomnia.Agreemod.BI.Options;
 using Insomnia.Agreemod.Data.ViewModels.Output;
 using Insomnia.Agreemod.General.Expansions;
+using System.Collections.Concurrent;
+using System.Collections;
 
 namespace Insomnia.Agreemod.BI.Services
 {
@@ -27,13 +30,67 @@ namespace Insomnia.Agreemod.BI.Services
 
 
         private readonly NotionClient _client;
+        private readonly IFiles _files;
 
-        public Notion()
+        public Notion(IFiles files)
         {
             _client = NotionClientFactory.Create(new ClientOptions
             {
                 AuthToken = "secret_53UctpAbVC9WQKtKexCPEhEw8FIkJNq5nq9nfemeR5x"
             });
+            _files = files;
+        }
+
+        public async Task<ChatUsersReturn> GetChatUsers()
+        {
+            try
+            {
+                var volunteers = await GetVolunteers();
+
+                var users = volunteers.UsersFilter().Select(p => new ChatUser()
+                {
+                    Uuid = p.Uuid,
+                    Name = p.GetName(),
+                    Nickname = p.TranslateName(),
+                    Chats = p.GetChats(),
+                    Password = p.GenPassword()
+                }).ToList();
+
+                return new ChatUsersReturn()
+                {
+                    Success = true,
+                    Users = users,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ChatUsersReturn()
+                {
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                    Users = new List<ChatUser> { }
+                };
+            }
+        }
+
+        public async Task<Stream> ExportLocations()
+        {
+            var locations = await GetLocations();
+
+            if (!locations.Success)
+                return null;
+
+            return await _files.ExportLocations(locations.Locations);
+        }
+
+        public async Task<Stream> ExportPeoples()
+        {
+            var peoples = await GetPeoples();
+
+            if (!peoples.Success)
+                return null;
+
+            return await _files.Export(peoples.Peoples);
         }
 
         public async Task<PeoplesReturn> GetPeoples()
@@ -45,13 +102,13 @@ namespace Insomnia.Agreemod.BI.Services
                 peoples.AddRange(await GetVolunteers());
                 peoples.AddRange(await GetPrticipants());
 
-                var result = peoples.Where(x => !String.IsNullOrEmpty(x.Name)).Select(x => new PeopleOutput()
+                var result = peoples.PeoplesFilter().Select(x => new PeopleOutput()
                 {
                     Uuid = x.Uuid,
                     Name = x.Name,
                     Nickname = x.Nickname,
-                    Directions = x.Directions.RemoveSystemsLocations() ?? x.OwnedbyLocation,
-                    Locations = x.LeaderLocations,
+                    Directions = !x.VolunteerDirections.IsNullOrEmpty() ? x.VolunteerDirections : x.Directions.RemoveSystemsLocations() ?? x.OwnedbyLocation,
+                    Locations = x.LeaderLocations ?? x.OwnedbyLocation,
                     Email = x.Email,
                     Phone = x.Phone,
                     Position = x.GetPosition(),
@@ -61,7 +118,9 @@ namespace Insomnia.Agreemod.BI.Services
                     DepartureDate = x.DepartureDate,
                     FoodType = x.GetFoodType(),
                     BadgeColor = x.GetBadgeColor(),
-                }).ToArray();
+                    IsVolunteer = x.IsVolunteer,
+                    QR = x.Uuid.ToString().Split('-')[0]
+                }).ToList();
 
                return new PeoplesReturn()
                 {
@@ -75,9 +134,33 @@ namespace Insomnia.Agreemod.BI.Services
                 {
                     Success = false,
                     ErrorMessage = ex.Message,
-                    Peoples = new PeopleOutput[] { }
+                    Peoples = new List<PeopleOutput> { }
                 };
             }
+        }
+
+        private async Task<IList<TimetableDto>> GetTimetables()
+        {
+            var filter = new DatabasesQueryParameters() { Sorts = new List<Sort>() { new Sort() { Property = TablePropertiesNaming.VolunteerName, Direction = Direction.Ascending, Timestamp = Timestamp.CreatedTime } } };
+
+            var database = new PaginatedList<Page>();
+
+            List<TimetableDto> timetables = new List<TimetableDto>();
+
+            do
+            {
+                filter.StartCursor = database.NextCursor;
+
+                database = await GetDatabase(DatabaseIds.Timetables, filter);
+
+                timetables.AddRange((await Task.WhenAll(database.Results.Select(async x => new TimetableDto()
+                {
+
+                }))).ToList());
+            }
+            while (database.NextCursor != null);
+
+            return timetables;
         }
 
         public async Task<LocationsReturn> GetLocations()
@@ -89,6 +172,8 @@ namespace Insomnia.Agreemod.BI.Services
                 var locations = await Task.WhenAll(database.Results.Select(async x => new LocationDto()
                 {
                     Name = (x.Properties[TablePropertiesNaming.LocationName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
+                    ShortName = (x.Properties[TablePropertiesNaming.SmallLocationName] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    Description = (x.Properties[TablePropertiesNaming.LocationDescription] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText, 
                     Directions = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.Direction] as RelationPropertyValue).Relation),
                     Tags = (x.Properties[TablePropertiesNaming.Tags] as MultiSelectPropertyValue).MultiSelect.Select(x => x.Name).ToArray()
                 }));
@@ -96,7 +181,7 @@ namespace Insomnia.Agreemod.BI.Services
                 return new LocationsReturn()
                 {
                     Success = true,
-                    Locations = locations,
+                    Locations = locations.ToList(),
                 };
             }
             catch (Exception ex)
@@ -105,7 +190,7 @@ namespace Insomnia.Agreemod.BI.Services
                 {
                     Success = false,
                     ErrorMessage = ex.Message,
-                    Locations = new LocationDto[] {}
+                    Locations = new List<LocationDto>()
                 };
             }
         }
@@ -140,9 +225,10 @@ namespace Insomnia.Agreemod.BI.Services
                     LeaderLocations = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.VolunteerLeader] as RelationPropertyValue).Relation),
                     ArrivalDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.Start,
                     DepartureDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.End,
-                }))).ToList());
+                    IsWeekendVolunteer = (x.Properties[TablePropertiesNaming.VolunteerWeekend] as CheckboxPropertyValue).Checkbox
+                }))).VolunteersFilter().ToList());
             }
-            while (database.Results.Count() == 100);
+            while (database.NextCursor != null);
 
             return peoples;
         }
@@ -175,9 +261,9 @@ namespace Insomnia.Agreemod.BI.Services
                     DepartureDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.End,
                     FoodType = (x.Properties[TablePropertiesNaming.PrticipantTypeFood] as SelectPropertyValue).Select?.Name,
                     NutritionFeatures = (x.Properties[TablePropertiesNaming.IsVegan] as CheckboxPropertyValue).Checkbox ? "Веган" : String.Empty,
-                }))).ToList());
+                }))).PrticipantssFilter().ToList());
             }
-            while (database.Results.Count() == 100);
+            while (database.NextCursor != null);
 
             return peoples;
         }
@@ -202,23 +288,23 @@ namespace Insomnia.Agreemod.BI.Services
 
         private async Task<string> GetLocationName(string id)
         {
-            var result = DirectionsCash.FirstOrDefault(x => x.Id == id);
+            var result = GetCash(id);
 
             if (result == null)
             {
-
                 var page = await _client.Pages.RetrieveAsync(id);
 
                 result = new DirectionDto()
                 {
                     Id = id,
-                    Name = (page.Properties[TablePropertiesNaming.LocationName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText
+                    Name = (page.Properties[TablePropertiesNaming.LocationName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
+                    SmallName = (page.Properties[TablePropertiesNaming.SmallLocationName] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText
                 };
 
                 AddCash(result);
             }
 
-            return result.Name;
+            return result.GetName;
         }
 
         private async Task<string> GetDirectionName(string id)
@@ -232,13 +318,14 @@ namespace Insomnia.Agreemod.BI.Services
                 result = new DirectionDto()
                 {
                     Id = id,
-                    Name = (page.Properties[TablePropertiesNaming.TitlePageName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText
+                    Name = (page.Properties[TablePropertiesNaming.TitlePageName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
+                    SmallName = (page.Properties[TablePropertiesNaming.SmallTitlePageName] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText
                 };
 
                 AddCash(result);
             }
 
-            return result.Name;
+            return result.GetName;
         }
 
         private DirectionDto GetCash(string id)
