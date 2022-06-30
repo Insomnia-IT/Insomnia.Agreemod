@@ -10,6 +10,6 @@ namespace Insomnia.Agreemod.BI.Interfaces
 {
     public interface IExcel
     {
-        byte[] ExcelFileGenerate<T>(List<T> report) where T : ExportModel;
+        Task<byte[]> ExcelFileGenerate<T>(ExcelModel<T> report, string fileName) where T : ExportModel;
     }
 }

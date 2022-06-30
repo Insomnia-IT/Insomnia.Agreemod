@@ -8,6 +8,14 @@ namespace Insomnia.Agreemod.General.Expansions
 {
     public static class ArrayExpansions
     {
+        public static List<T> ToListOrNull<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable is null || !enumerable.Any())
+                return null;
+
+            return enumerable.ToList();
+        }
+
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
             if(array is null)

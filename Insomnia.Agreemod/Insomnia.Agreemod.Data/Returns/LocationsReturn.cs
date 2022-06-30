@@ -9,6 +9,6 @@ namespace Insomnia.Agreemod.Data.Returns
 {
     public class LocationsReturn : BaseReturn
     {
-        public LocationDto[] Locations { get; set; }
+        public List<LocationDto> Locations { get; set; }
     }
 }

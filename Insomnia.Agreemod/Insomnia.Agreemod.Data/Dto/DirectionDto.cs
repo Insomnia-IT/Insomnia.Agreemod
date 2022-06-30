@@ -11,5 +11,9 @@ namespace Insomnia.Agreemod.Data.Dto
         public string Id { get; set; }
 
         public string Name { get; set; }
+
+        public string SmallName { get; set; }
+
+        public string GetName => String.IsNullOrEmpty(SmallName) ? Name : SmallName;
     }
 }

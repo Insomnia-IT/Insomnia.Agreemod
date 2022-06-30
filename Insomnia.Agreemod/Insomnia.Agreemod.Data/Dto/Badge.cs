@@ -10,10 +10,19 @@ namespace Insomnia.Agreemod.Data.Dto
 {
     public class Badge : ExportModel
     {
-        [HeaderNaming("имя фамилия")]
+        [HeaderNaming("ФИО")]
         public string Name { get; set; }
 
-        [HeaderNaming("Тип")]
-        public string Type { get; set; }
+        [HeaderNaming("Позывной")]
+        public string Nickname { get; set; }
+
+        [HeaderNaming("Должность")]
+        public string Position { get; set; }
+
+        [HeaderNaming("Фото")]
+        public string Photo { get; set; }
+
+        [HeaderNaming("QR")]
+        public string QR { get; set; }
     }
 }

@@ -21,6 +21,11 @@ namespace Insomnia.Agreemod.API.Configurations.Autofac
             builder.RegisterType<ExcelService>()
                 .As<IExcel>();
 
+            builder.RegisterType<Files>()
+                .As<IFiles>();
+
+            builder.RegisterType<FormatterPhotoPeople>();
+
             builder.Register(context => new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<AutoMapperProfile>();

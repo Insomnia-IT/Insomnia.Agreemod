@@ -9,5 +9,7 @@ namespace Insomnia.Agreemod.BI.Options
     public class Config
     {
        // public NotionConfig Notion { get; set; }
+
+       // public FilesConfig Files { get; set; }
     }
 }

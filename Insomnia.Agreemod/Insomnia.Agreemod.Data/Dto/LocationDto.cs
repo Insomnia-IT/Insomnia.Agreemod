@@ -14,6 +14,16 @@ namespace Insomnia.Agreemod.Data.Dto
         public string Name { get; set; }
 
         /// <summary>
+        /// Коротное название локации
+        /// </summary>
+        public string ShortName { get; set; }
+
+        /// <summary>
+        /// Описание локации
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
         /// Поле: Статус локации
         /// Тэги локации
         /// </summary>

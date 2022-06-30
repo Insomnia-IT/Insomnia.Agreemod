@@ -21,6 +21,10 @@ namespace Insomnia.Agreemod.Data.Enums
         /// </summary>
         Blue,
         /// <summary>
+        /// Синий, но с отдельным дизайном. Цвет бейджа для работников из лаборатории.
+        /// </summary>
+        BlueLab,
+        /// <summary>
         /// Фиолетовый. Цвет бейджа волонтёра, который принадлежит медпункту.
         /// </summary>
         Purple,

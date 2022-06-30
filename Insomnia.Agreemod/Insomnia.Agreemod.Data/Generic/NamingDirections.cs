@@ -10,5 +10,6 @@ namespace Insomnia.Agreemod.Data.Generic
     {
         public const string FirstAidPost = "Медпункт";
         public const string VetviDereva = "Ветви Дерева";
+        public const string Laboratory = "Лаборатория";
     }
 }
