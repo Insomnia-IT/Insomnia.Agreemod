@@ -24,22 +24,17 @@ namespace Insomnia.Agreemod.BI.Services
         private IMapper _mapper;
         private object locker = new object();
 
-        private static (BadgeColor Color, int Count, string position)[] EmptyBadges = new[] {
-             (BadgeColor.Green, 40, "Волонтёр"),
-             (BadgeColor.Green, 20, "Stage CREW"),
-             (BadgeColor.Green, 10, "Прокатчик"),
-             (BadgeColor.Green, 4, "Звукорежиссёр FOH"),
-             (BadgeColor.Green, 4, "Backline/MON"),
-             (BadgeColor.Green, 3, "Художник по свету"),
-             (BadgeColor.Green, 4, "Оформители"),
-             (BadgeColor.Green, 6, "Смотритель ЦУЭ"),
-             (BadgeColor.Yellow, 50, "Свои"),
-             (BadgeColor.Purple, 10, "Медлокация"),
-             (BadgeColor.Orange, 150, "Музыкант"),
-             (BadgeColor.Green, 25, "Музыкальная сцена"),
-             (BadgeColor.Blue, 10, ""),
-           //  (BadgeColor.Yellow, 150, "Пресса"),
-             (BadgeColor.Green, 20, "Стража"),
+        private static (BadgeColor Color, int Count, string position, string name)[] EmptyBadges = new[] {
+             (BadgeColor.Green, 10, "Музыкальная сцена", ""),
+             (BadgeColor.Green, 25, "Staff", "Музыкальная сцена"),
+             (BadgeColor.Green, 35, "Волонтёр", ""),
+             (BadgeColor.Orange, 6, "Энергоснаб", "ЕЭС БС"),
+             (BadgeColor.Orange, 10, "Мастер-классы", ""),
+             (BadgeColor.Orange, 5, "Лекторий", ""),
+             (BadgeColor.Orange, 45, "Автор", ""),
+             (BadgeColor.Orange, 5, "VIP", "Лагерь аниматоров"),
+             (BadgeColor.Yellow, 10, "VIP", ""),
+             (BadgeColor.Purple, 12, "Медлокация", ""),
             };
 
         public Files(IExcel excel, IMapper mapper)
@@ -58,7 +53,7 @@ namespace Insomnia.Agreemod.BI.Services
 
             foreach (var badge in EmptyBadges)
                 for (var x = 0; x < badge.Count; x++)
-                    list.Add(new PeopleOutput() { Position = badge.position, QR = Guid.NewGuid().ToString(), BadgeColor = badge.Color });
+                    list.Add(new PeopleOutput() { Position = badge.position, QR = Guid.NewGuid().ToString(), BadgeColor = badge.Color, Name = badge.name });
 
             return list;
         }

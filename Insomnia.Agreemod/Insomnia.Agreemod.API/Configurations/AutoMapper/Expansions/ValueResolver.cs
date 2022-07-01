@@ -37,7 +37,10 @@ namespace Insomnia.Agreemod.API.Configurations.AutoMapper
 
                 var extension = url.Split('?')[0].Split('.').Last();
 
-                var name = String.IsNullOrEmpty(source.Name) ? source.Nickname.Replace(':', 't') : source.Name.Replace(':', 't');
+                var name = String.IsNullOrEmpty(source.Name) ? String.IsNullOrEmpty(source.Nickname) ? url : source.Nickname.Replace(':', 't') : source.Name.Replace(':', 't');
+                if (name is null)
+                    return null;
+                
                 var fileName = $"{name}_{source.Uuid.Split('-')[0]}.{extension}";
 
                 if (!File.Exists(GetFilePath(fileName)))

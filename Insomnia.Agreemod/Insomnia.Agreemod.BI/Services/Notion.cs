@@ -30,6 +30,7 @@ namespace Insomnia.Agreemod.BI.Services
 
 
         private readonly NotionClient _client;
+        private readonly NotionClient _edit;
         private readonly IFiles _files;
 
         public Notion(IFiles files)
@@ -37,6 +38,10 @@ namespace Insomnia.Agreemod.BI.Services
             _client = NotionClientFactory.Create(new ClientOptions
             {
                 AuthToken = "secret_53UctpAbVC9WQKtKexCPEhEw8FIkJNq5nq9nfemeR5x"
+            });
+            _edit = NotionClientFactory.Create(new ClientOptions
+            {
+                AuthToken = "secret_jp2OKzVzV9CY8RySPb4ObTMultLKWvEXbsVh9CwSsd9"
             });
             _files = files;
         }
