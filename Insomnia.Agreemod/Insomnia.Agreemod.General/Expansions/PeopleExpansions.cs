@@ -15,7 +15,7 @@ namespace Insomnia.Agreemod.General.Expansions
         private static string[] WhoItProfessions = new[] { WhoIt.Lecturer, WhoIt.Musicant, WhoIt.Animator, WhoIt.Master };
         private static string[] FoodTypes = new[] { NamingFoodType.Free, NamingFoodType.Discont50 };
         private static string[] SystemLocations = new[] { NamingDirections.VetviDereva };
-        private static string[] DictionaryForGenPassword = new string[]
+        private static string[] DictionaryForGenPassword = (new string[]
         {
             "Ahegao",
             "Airtight",
@@ -175,7 +175,7 @@ namespace Insomnia.Agreemod.General.Expansions
             "Virtual Reality",
             "Wank",
             "Webcam",
-        };
+        }).Select(s => s.ToLowerInvariant()).ToArray();
 
         public static BadgeColor GetBadgeColor(this PeopleDto people)
         {
@@ -281,7 +281,13 @@ namespace Insomnia.Agreemod.General.Expansions
 
         public static string GenPassword(this PeopleDto people)
         {
-            var newPassword = DictionaryForGenPassword[(new Random()).Next(0, DictionaryForGenPassword.Length - 1)].RemoveNotLetters() + (new Random()).Next(0, 9) + DictionaryForGenPassword[(new Random()).Next(0, DictionaryForGenPassword.Length - 1)].RemoveNotLetters();
+            var newPassword = DictionaryForGenPassword[
+                (new Random())
+                .Next(0, DictionaryForGenPassword.Length - 1)]
+                .RemoveNotLetters()
+                + '-' + DictionaryForGenPassword[
+                    (new Random()).Next(0, DictionaryForGenPassword.Length - 1)
+                    ].RemoveNotLetters();
 
             return newPassword;
         }

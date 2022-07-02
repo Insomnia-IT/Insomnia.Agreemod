@@ -37,9 +37,9 @@ namespace Insomnia.Agreemod.General.Expansions
             ('ч', "ch"),
             ('ш', "sh"),
             ('щ', "shch"),
-            ('ъ', "."),
+            ('ъ', ""),
             ('ы', "ui"),
-            ('ь', "'"),
+            ('ь', ""),
             ('э', "ye"),
             ('ю', "yu"),
             ('я', "ya"),
@@ -90,8 +90,10 @@ namespace Insomnia.Agreemod.General.Expansions
                 var random = (new Random()).Next(0, NewCharForWhiteSpace.Length);
                 return NewCharForWhiteSpace[random];
             }
+
             if (c == '_' || c == '.')
                 return $"{c}";
+
             if(new char[] {'0','1','2','3','4','5','6','7','8','9'}.Contains(c))
                 return $"{c}";
 

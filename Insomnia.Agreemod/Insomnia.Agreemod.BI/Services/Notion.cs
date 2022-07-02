@@ -50,7 +50,7 @@ namespace Insomnia.Agreemod.BI.Services
                 var users = volunteers.UsersFilter().Select(p => new ChatUser()
                 {
                     Uuid = p.Uuid,
-                    Name = p.GetName(),
+                    Name = p.Name,
                     Nickname = p.TranslateName(),
                     Chats = p.GetChats(),
                     Password = p.GenPassword()
