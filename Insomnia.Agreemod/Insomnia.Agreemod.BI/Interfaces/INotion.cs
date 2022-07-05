@@ -14,6 +14,8 @@ namespace Insomnia.Agreemod.BI.Interfaces
 
         Task<LocationsReturn> GetLocations();
 
+        Task<TimetablesReturn> GetTimetablesForLocations();
+
         Task<Stream> ExportPeoples();
 
         Task<Stream> ExportLocations();

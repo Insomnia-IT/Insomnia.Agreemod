@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Insomnia.Agreemod.Data.Dto
 {
-    public class TimetableDto
+    public class AudienceDto
     {
-        public string Location { get; set; }
+        public int Number { get; set; }
 
-        public List<AudienceDto> Audiences { get; set; }
-
-        public string Day { get; set; }
+        public List<TimetableElementDto> Elements {get; set;}
     }
 }

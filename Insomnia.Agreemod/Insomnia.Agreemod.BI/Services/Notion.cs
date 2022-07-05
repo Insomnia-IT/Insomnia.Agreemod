@@ -32,8 +32,9 @@ namespace Insomnia.Agreemod.BI.Services
         private readonly NotionClient _client;
         private readonly NotionClient _edit;
         private readonly IFiles _files;
+        private readonly IWord _word;
 
-        public Notion(IFiles files)
+        public Notion(IFiles files, IWord word)
         {
             _client = NotionClientFactory.Create(new ClientOptions
             {
@@ -44,6 +45,7 @@ namespace Insomnia.Agreemod.BI.Services
                 AuthToken = "secret_jp2OKzVzV9CY8RySPb4ObTMultLKWvEXbsVh9CwSsd9"
             });
             _files = files;
+            _word = word;
         }
 
         public async Task<ChatUsersReturn> GetChatUsers()
@@ -98,6 +100,109 @@ namespace Insomnia.Agreemod.BI.Services
             return await _files.Export(peoples.Peoples);
         }
 
+        public async Task ExportTimetables()
+        {
+            try
+            {
+                var re = await GetTimetablesForLocations();
+                _word.CreateDocument(re.Timetables);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public async Task<TimetablesReturn> GetTimetablesForLocations()
+        {
+            try
+            {
+               var timetables = await GetTimetables();
+
+               var re = new TimetablesReturn()
+                {
+                    Success = true,
+                    Timetables = timetables.TimetablesFilter().GroupBy(x => x.Location).Select(x => new
+                    {
+                        Days = x.GroupBy(y => y.Day),
+                        Location = x.Key
+                    }).Select(x =>
+                    {
+                        var result = new List<TimetableDto>();
+
+                        foreach (var day in x.Days)
+                        {
+                            var audienceOne = day != null && !day.Key.Contains('2') ? null : day;
+                            var audince1 = audienceOne == null ? null : new AudienceDto()
+                            {
+                                Number = 1,
+                                Elements = audienceOne.Select(x => x).Select(x =>
+                                {
+                                    return new TimetableElementDto()
+                                    {
+                                        Name = x.Naming,
+                                        Description =  x.Description,
+                                        SpeakerDescription = x.DescriptionSpeaker,
+                                        Speaker = x.Speaker,
+                                        Time = x.TimeStart,
+                                        Type = x.Type
+                                    };
+                                }).ToList()
+                            };
+                            var audinceTwo = day != null && day.Key.Contains('2') ? null : day;
+
+                            var audince2 = audinceTwo == null ? null : new AudienceDto()
+                            {
+                                Number = 2,
+                                Elements = audinceTwo.Select(x => x).Select(x =>
+                                {
+                                    return new TimetableElementDto()
+                                    {
+                                        Name = x.Naming,
+                                        Description = x.Description,
+                                        SpeakerDescription = x.DescriptionSpeaker,
+                                        Speaker = x.Speaker,
+                                        Time = x.TimeStart,
+                                        Type = x.Type
+                                    };
+                                }).ToList()
+                            };
+
+                            result.Add(new TimetableDto()
+                            {
+                                Audiences = new List<AudienceDto>() { audince1, audince2 }.Where(x => x != null).ToList(),
+                                Day = day.Key.Replace(" 2","").AddOrderingChart(),
+                                Location = x.Location
+                            });
+                        }
+                        return result.Where(x => !String.IsNullOrEmpty(x.Day)).GroupBy(x => x.Day).OrderBy(x => x.Key).Select(x => new TimetableDto()
+                        {
+                            Day = x.Key.RemoveOrderingChart(),
+                            Audiences = x.Select(y => y).SelectMany(y => y.Audiences).GroupBy(y => y.Number).Select( y => new AudienceDto()
+                            {
+                                Number = y.Key,
+                                Elements = y.SelectMany(z => z.Elements).ToList()
+                            }).ToList(),
+                            Location = x.Select(y => y).First().Location
+                        }).ToList();
+                    }).SelectMany(x => x).ToList()
+
+                };
+
+                return re;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new TimetablesReturn()
+                {
+                    Success = true,
+                    ErrorMessage = ex.Message,
+                    Timetables = new List<TimetableDto>()
+                };
+            }
+        }
+
         public async Task<PeoplesReturn> GetPeoples()
         {
             try
@@ -144,13 +249,13 @@ namespace Insomnia.Agreemod.BI.Services
             }
         }
 
-        private async Task<IList<TimetableDto>> GetTimetables()
+        private async Task<IList<TimetableSourceDto>> GetTimetables()
         {
-            var filter = new DatabasesQueryParameters() { Sorts = new List<Sort>() { new Sort() { Property = TablePropertiesNaming.VolunteerName, Direction = Direction.Ascending, Timestamp = Timestamp.CreatedTime } } };
+            var filter = new DatabasesQueryParameters() { Sorts = new List<Sort>() { new Sort() { Property = TablePropertiesNaming.TimetableDay, Direction = Direction.Ascending, Timestamp = Timestamp.CreatedTime } } };
 
             var database = new PaginatedList<Page>();
 
-            List<TimetableDto> timetables = new List<TimetableDto>();
+            List<TimetableSourceDto> timetables = new List<TimetableSourceDto>();
 
             do
             {
@@ -158,9 +263,19 @@ namespace Insomnia.Agreemod.BI.Services
 
                 database = await GetDatabase(DatabaseIds.Timetables, filter);
 
-                timetables.AddRange((await Task.WhenAll(database.Results.Select(async x => new TimetableDto()
+                timetables.AddRange((await Task.WhenAll(database.Results.Select(async x => new TimetableSourceDto()
                 {
-
+                    Location = (await GetLocationNaming((x.Properties[TablePropertiesNaming.TimetableLocation] as RelationPropertyValue).Relation)).FirstOrDefault(),
+                    Day = (x.Properties[TablePropertiesNaming.TimetableDay] as MultiSelectPropertyValue).MultiSelect.Select(x => x.Name).FirstOrDefault(),
+                    TimeStart = (x.Properties[TablePropertiesNaming.TimetableStart] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    TimeEnd = (x.Properties[TablePropertiesNaming.TimetableEnd] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    Type = (x.Properties[TablePropertiesNaming.TimetableType] as SelectPropertyValue).Select?.Name,
+                    Price = (x.Properties[TablePropertiesNaming.TimetableEnd] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    Naming = (x.Properties[TablePropertiesNaming.TimetableName] as TitlePropertyValue).Title.FirstOrDefault()?.PlainText,
+                    Description = (x.Properties[TablePropertiesNaming.TimetableDescription] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    DescriptionSpeaker = (x.Properties[TablePropertiesNaming.TimetableDescriptionSpeaker] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    SmallDescription = (x.Properties[TablePropertiesNaming.TimetableSmallDescription] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
+                    Speaker = (x.Properties[TablePropertiesNaming.TimetableSpeaker] as RichTextPropertyValue)?.RichText.FirstOrDefault()?.PlainText,
                 }))).ToList());
             }
             while (database.NextCursor != null);
@@ -225,7 +340,7 @@ namespace Insomnia.Agreemod.BI.Services
                     Directions = (x.Properties[TablePropertiesNaming.VolunteerDirection] as MultiSelectPropertyValue).MultiSelect.Select(x => x.Name).ToArray(),
                     WhoIt = (x.Properties[TablePropertiesNaming.VolunteerWhoIt] as FormulaPropertyValue).Formula?.String,
                     Avatar = (x.Properties[TablePropertiesNaming.VolunteerAvatar] as FilesPropertyValue).Files?.Select(x => x as UploadedFileWithName).FirstOrDefault()?.File?.Url,
-                    VolunteerDirections = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.IsVolunteer] as RelationPropertyValue).Relation),
+                    VolunteerDirections = await GetLocationNaming((x.Properties[TablePropertiesNaming.IsVolunteer] as RelationPropertyValue).Relation),
                     FoodType = (x.Properties[TablePropertiesNaming.VolunteerFoodType] as SelectPropertyValue).Select?.Name,
                     LeaderLocations = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.VolunteerLeader] as RelationPropertyValue).Relation),
                     ArrivalDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.Start,

@@ -24,6 +24,9 @@ namespace Insomnia.Agreemod.API.Configurations.Autofac
             builder.RegisterType<Files>()
                 .As<IFiles>();
 
+            builder.RegisterType<WordService>()
+                .As<IWord>();
+
             builder.RegisterType<FormatterPhotoPeople>();
 
             builder.Register(context => new MapperConfiguration(cfg =>

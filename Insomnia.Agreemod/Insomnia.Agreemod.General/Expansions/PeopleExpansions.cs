@@ -273,7 +273,6 @@ namespace Insomnia.Agreemod.General.Expansions
 "33dcef29",
 "56679462",
 "d63976a2",
-"25c62e59",
 "8294a5ad",
 "2da5d771",
 "9e4150e3",
@@ -707,7 +706,7 @@ namespace Insomnia.Agreemod.General.Expansions
                     result = BadgeColor.Red;
                 else if (people.IsVolunteer)
                 {
-                    if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true)
+                    if (people.VolunteerDirections?.Contains(NamingDirections.FirstAidPost) == true || people.VolunteerDirections?.Contains(NamingDirections.FirstAidPostLocation) == true)
                         result = BadgeColor.Purple;
                     else
                         result = BadgeColor.Green;
@@ -849,7 +848,7 @@ namespace Insomnia.Agreemod.General.Expansions
 
         public static IEnumerable<PeopleDto> PrticipantssFilter(this IEnumerable<PeopleDto> peoples)
         {
-            return peoples;//.Where(x => !OldUsers.Contains(x.Uuid.Split('-')[0]));
+            return peoples.Where(x => !OldUsers.Contains(x.Uuid.Split('-')[0]));
         }
 
         public static IEnumerable<PeopleDto> UsersFilter(this IEnumerable<PeopleDto> peoples)
@@ -859,7 +858,7 @@ namespace Insomnia.Agreemod.General.Expansions
 
         public static IEnumerable<PeopleDto> PeoplesFilter(this IEnumerable<PeopleDto> peoples)
         {
-            return peoples.Where(x => !x.LeaderLocations.IsNullOrEmpty() || (x.ArrivalDate.HasValue && x.ArrivalDate.Value < new DateTime(2022,7,9)) || x.IsWeekendVolunteer);
+            return peoples;//.Where(x => !x.LeaderLocations.IsNullOrEmpty() || (x.ArrivalDate.HasValue && x.ArrivalDate.Value < new DateTime(2022,7,9)) || x.IsWeekendVolunteer);
         }
 
         public static string[] RemoveSystemsLocations(this string[] locations)

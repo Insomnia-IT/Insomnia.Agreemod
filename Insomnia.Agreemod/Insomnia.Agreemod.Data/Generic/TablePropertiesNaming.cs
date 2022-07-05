@@ -53,6 +53,7 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string TimetableStart = "Время начала";
         public const string TimetableEnd = "Время окончания";
         public const string TimetableDescription = "Краткое описание";
+        public const string TimetableSmallDescription = "Описание для интронета";
         public const string TimetableDescriptionSpeaker = "Описание автора";
         public const string TimetablePrice = "Стоимость";
 

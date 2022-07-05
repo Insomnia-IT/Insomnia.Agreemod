@@ -52,6 +52,26 @@ namespace Insomnia.Agreemod.General.Expansions
         };
 
 
+        public static string AddOrderingChart(this string day)
+            => day switch
+            {
+                "Четверг" => "1Четверг",
+                "Пятница" => "2Пятница",
+                "Суббота" => "3Суббота",
+                "Воскресенье" => "4Воскресенье",
+                "Понедельник" => "5Понедельник"
+            };
+
+        public static string RemoveOrderingChart(this string day)
+                    => day switch
+                    {
+                        "1Четверг" => "Четверг",
+                        "2Пятница" => "Пятница",
+                        "3Суббота" => "Суббота",
+                        "4Воскресенье" => "Воскресенье",
+                        "5Понедельник" => "Понедельник"
+                    };
+
         public static bool CanParseToInt(this string number)
         {
             try

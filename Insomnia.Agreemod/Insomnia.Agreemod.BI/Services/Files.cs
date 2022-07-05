@@ -67,6 +67,15 @@ namespace Insomnia.Agreemod.BI.Services
 
         public async Task<Stream> Export(List<PeopleOutput> members)
         {
+            members.Add(new PeopleOutput()
+            {
+                BadgeColor = BadgeColor.Green,
+                Name = "Единорожка",
+                Position = "Алкофан",
+                Avatar = "Единорожка_9de84bf5.png",
+                QR = "9de84bf5"
+            });
+
             foreach (var member in members.Where(x => x.BadgeColor != BadgeColor.BlueLab).GroupBy(x => x.BadgeColor).Select(x => new
             {
                 FileName = x.Key.ToString(),
