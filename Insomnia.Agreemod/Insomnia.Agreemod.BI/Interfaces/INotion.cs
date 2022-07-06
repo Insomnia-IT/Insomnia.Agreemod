@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using Insomnia.Agreemod.Data.Returns;
+using Insomnia.Agreemod.Data.ViewModels.Input;
 
 namespace Insomnia.Agreemod.BI.Interfaces
 {
@@ -21,5 +22,9 @@ namespace Insomnia.Agreemod.BI.Interfaces
         Task<Stream> ExportLocations();
 
         Task<ChatUsersReturn> GetChatUsers();
+
+        Task<MarkArrivalReturn> MarkArrivals(ArrivalUsers users);
+
+        Task<MarkArrivalReturn> MarkArrival(ArrivalUser user);
     }
 }

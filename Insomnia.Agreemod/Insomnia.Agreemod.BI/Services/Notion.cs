@@ -16,6 +16,7 @@ using Insomnia.Agreemod.Data.ViewModels.Output;
 using Insomnia.Agreemod.General.Expansions;
 using System.Collections.Concurrent;
 using System.Collections;
+using Insomnia.Agreemod.Data.ViewModels.Input;
 
 namespace Insomnia.Agreemod.BI.Services
 {
@@ -46,6 +47,88 @@ namespace Insomnia.Agreemod.BI.Services
             });
             _files = files;
             _word = word;
+        }
+
+        public async Task<MarkArrivalReturn> MarkArrivals(ArrivalUsers users)
+        {
+            var errorUsers = new List<string>();
+
+            try
+            {
+                foreach (var user in users.Users)
+                {
+                    var u = await MarkArrivalForUserId(user.Id);
+                    if (u != null)
+                        errorUsers.Add(u);
+                }
+
+                return new MarkArrivalReturn()
+                {
+                    Success = true,
+                    ErrorUsers = errorUsers
+                };
+            }
+            catch(Exception ex)
+            {
+                return new MarkArrivalReturn()
+                {
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                    ErrorUsers = errorUsers
+                };
+            }
+        }
+
+        public async Task<MarkArrivalReturn> MarkArrival(ArrivalUser user)
+        {
+            var errorUsers = new List<string>();
+
+            try
+            {
+                var u = await MarkArrivalForUserId(user.Id);
+                if (u != null)
+                    errorUsers.Add(u);
+
+                return new MarkArrivalReturn()
+                {
+                    Success = true,
+                    ErrorUsers = errorUsers
+                };
+            }
+            catch (Exception ex)
+            {
+                return new MarkArrivalReturn()
+                {
+                    Success = false,
+                    ErrorMessage = ex.Message,
+                    ErrorUsers = errorUsers
+                };
+            }
+        }
+
+        private async Task<string> MarkArrivalForUserId(string id)
+        {
+            try
+            {
+                await _edit.Pages.UpdateAsync(id, new PagesUpdateParameters()
+                {
+                    Properties = new Dictionary<string, PropertyValue>()
+                    {
+                        { TablePropertiesNaming.IsArrival, new CheckboxPropertyValue()
+                            {
+                                Checkbox = true
+                            }
+                        }
+                    }
+                });
+
+                return null;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return id;
+            }
         }
 
         public async Task<ChatUsersReturn> GetChatUsers()
@@ -340,13 +423,13 @@ namespace Insomnia.Agreemod.BI.Services
                     Directions = (x.Properties[TablePropertiesNaming.VolunteerDirection] as MultiSelectPropertyValue).MultiSelect.Select(x => x.Name).ToArray(),
                     WhoIt = (x.Properties[TablePropertiesNaming.VolunteerWhoIt] as FormulaPropertyValue).Formula?.String,
                     Avatar = (x.Properties[TablePropertiesNaming.VolunteerAvatar] as FilesPropertyValue).Files?.Select(x => x as UploadedFileWithName).FirstOrDefault()?.File?.Url,
-                    VolunteerDirections = await GetLocationNaming((x.Properties[TablePropertiesNaming.IsVolunteer] as RelationPropertyValue).Relation),
+                    VolunteerDirections = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.IsVolunteer] as RelationPropertyValue).Relation),
                     FoodType = (x.Properties[TablePropertiesNaming.VolunteerFoodType] as SelectPropertyValue).Select?.Name,
                     LeaderLocations = await GetDirectionsNaming((x.Properties[TablePropertiesNaming.VolunteerLeader] as RelationPropertyValue).Relation),
                     ArrivalDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.Start,
                     DepartureDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.End,
                     IsWeekendVolunteer = (x.Properties[TablePropertiesNaming.VolunteerWeekend] as CheckboxPropertyValue).Checkbox
-                }))).VolunteersFilter().ToList());
+                }))).ToList());
             }
             while (database.NextCursor != null);
 
@@ -381,7 +464,7 @@ namespace Insomnia.Agreemod.BI.Services
                     DepartureDate = (x.Properties[TablePropertiesNaming.VolunteerDates] as DatePropertyValue).Date?.End,
                     FoodType = (x.Properties[TablePropertiesNaming.PrticipantTypeFood] as SelectPropertyValue).Select?.Name,
                     NutritionFeatures = (x.Properties[TablePropertiesNaming.IsVegan] as CheckboxPropertyValue).Checkbox ? "Веган" : String.Empty,
-                }))).PrticipantssFilter().ToList());
+                }))).ToList());
             }
             while (database.NextCursor != null);
 
@@ -394,6 +477,11 @@ namespace Insomnia.Agreemod.BI.Services
                 queryParameters = new DatabasesQueryParameters();
 
             return await _client.Databases.QueryAsync(databaseId, queryParameters);
+        }
+
+        private async Task<string[]> GetLDirectionNaming(List<ObjectId> objects)
+        {
+            return (await Task.WhenAll(objects.Select(async x => await GetLocationName(x.Id)))).ToArray();
         }
 
         private async Task<string[]> GetLocationNaming(List<ObjectId> objects)

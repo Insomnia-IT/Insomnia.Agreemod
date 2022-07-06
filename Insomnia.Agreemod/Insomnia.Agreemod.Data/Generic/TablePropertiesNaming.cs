@@ -32,6 +32,7 @@ namespace Insomnia.Agreemod.Data.Generic
         public const string VolunteerFoodType = "Питание";
         public const string VolunteerId = "id";
         public const string VolunteerWeekend = "Выходные";
+        public const string IsArrival = "Доехал";
         //Участники
         public const string PrticipantName = "Имя";
         public const string PrticipantNickname = "Позывной";

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Insomnia.Agreemod.BI.Interfaces;
 using Insomnia.Agreemod.Data.Dto;
 using Insomnia.Agreemod.BI.Options;
+using Insomnia.Agreemod.Data.ViewModels.Input;
 
 namespace Insomnia.Agreemod.API.Controllers
 {
@@ -83,6 +84,18 @@ namespace Insomnia.Agreemod.API.Controllers
         public async Task<IActionResult> GetExportLocations()
         {
             return File(await _notion.ExportLocations(), "application/octet-stream", _config.ZipFileName);
+        }
+
+        [HttpPost("mark-arrivals")]
+        public async Task<IActionResult> MarkArrival([FromBody] ArrivalUsers model)
+        {
+            return Ok(await _notion.MarkArrivals(model));
+        }
+
+        [HttpPost("mark-arrival")]
+        public async Task<IActionResult> MarkArrival([FromBody] ArrivalUser model)
+        {
+            return Ok(await _notion.MarkArrival(model));
         }
     }
 }
