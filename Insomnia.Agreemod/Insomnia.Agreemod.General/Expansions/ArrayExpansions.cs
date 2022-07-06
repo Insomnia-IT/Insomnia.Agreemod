@@ -24,6 +24,14 @@ namespace Insomnia.Agreemod.General.Expansions
             return !array.Any();
         }
 
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable is null)
+                return true;
+
+            return !enumerable.Any();
+        }
+
         public static T[] NewUnion<T>(this T[] array1, T[] array2)
         {
             if(array1 is null || array1.Length == 0)

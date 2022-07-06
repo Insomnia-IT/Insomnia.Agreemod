@@ -35,9 +35,15 @@ namespace Insomnia.Agreemod.API.Configurations.AutoMapper
                 if(String.IsNullOrEmpty(url))
                     return null;
 
+                if (url == "Единорожка_9de84bf5.png")
+                    return url;
+
                 var extension = url.Split('?')[0].Split('.').Last();
 
-                var name = String.IsNullOrEmpty(source.Name) ? source.Nickname.Replace(':', 't') : source.Name.Replace(':', 't');
+                var name = String.IsNullOrEmpty(source.Name) ? String.IsNullOrEmpty(source.Nickname) ? url : source.Nickname.Replace(':', 't') : source.Name.Replace(':', 't');
+                if (name is null)
+                    return null;
+                
                 var fileName = $"{name}_{source.Uuid.Split('-')[0]}.{extension}";
 
                 if (!File.Exists(GetFilePath(fileName)))
