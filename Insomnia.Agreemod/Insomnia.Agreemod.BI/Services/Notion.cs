@@ -279,7 +279,7 @@ namespace Insomnia.Agreemod.BI.Services
                 Console.WriteLine(ex.Message);
                 return new TimetablesReturn()
                 {
-                    Success = true,
+                    Success = false,
                     ErrorMessage = ex.Message,
                     Timetables = new List<TimetableDto>()
                 };
