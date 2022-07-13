@@ -346,7 +346,7 @@ namespace Insomnia.Agreemod.General.Expansions
 
         public static IEnumerable<PeopleDto> UsersFilter(this IEnumerable<PeopleDto> peoples)
         {
-            return peoples;
+            return peoples.Where(x =>  !String.IsNullOrEmpty(x.Name) || !String.IsNullOrEmpty(x.Nickname));
         }
 
         public static IEnumerable<PeopleDto> PeoplesFilter(this IEnumerable<PeopleDto> peoples)

@@ -74,6 +74,16 @@ namespace Insomnia.Agreemod.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [HttpGet("export-schedules")]
+        public async Task<IActionResult> GetExportSchedules()
+        {
+            var result = await _notion.GetTimetablesForLocations();
+            if (result.Success)
+                return Ok(result.Timetables);
+
+            return BadRequest(result.ErrorMessage);
+        }
+
         [HttpGet("export")]
         public async Task<IActionResult> GetExport()
         {
