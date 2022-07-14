@@ -513,6 +513,9 @@ namespace Insomnia.Agreemod.BI.Services
                 AddCash(result);
             }
 
+            if (result.Name == "Шатер “Мастер-классы”" || result.SmallName == "Шатер “Мастер-классы”")
+                Console.WriteLine();
+
             return result.GetName;
         }
 
