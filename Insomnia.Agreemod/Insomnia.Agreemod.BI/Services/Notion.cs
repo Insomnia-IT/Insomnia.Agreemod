@@ -205,6 +205,7 @@ namespace Insomnia.Agreemod.BI.Services
                var re = new TimetablesReturn()
                 {
                     Success = true,
+                    ErrorMessage = "GOOD",
                     Timetables = timetables.TimetablesFilter().GroupBy(x => x.Location).Select(x => new
                     {
                         Days = x.GroupBy(y => y.Day),
