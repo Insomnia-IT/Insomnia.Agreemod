@@ -513,7 +513,7 @@ namespace Insomnia.Agreemod.BI.Services
                 AddCash(result);
             }
 
-            return result.GetName;
+            return result.Name;
         }
 
         private async Task<string> GetDirectionName(string id)
